@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/whtrbit/arduino-monitor-nodejs-server#readme",
   "dependencies": {
-    "johnny-five": "1.0.0"
+    "johnny-five": "1.0.0",
+    "moment": "2.22.2",
+    "request": "2.88.0"
   },
   "devDependencies": {}
 }
