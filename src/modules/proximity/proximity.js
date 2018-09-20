@@ -1,10 +1,26 @@
 const request = require('request');
 const five = require('johnny-five');
 
-const SETUP_ALARM = false;
+const SETUP_ALARM = true;
 
 const listenOnData = function () {
-    const ping = new five.Ping(7);
+    const ping = new five.Ping({
+        pin: 7,
+        freq: 3000
+    });
+    const getDistanceInMeters = function (distance) {
+        return (distance / 100).toFixed(2);
+    };
+    /**
+     * [
+     *     initialDistance,
+     *     currentDistance,
+     *     previousDistance
+     * ]
+     */
+    let distanceArr = [
+        null, null, null
+    ];
 
     ping.on('change', function () {
         if (this.cm <= 3) {
@@ -13,9 +29,15 @@ const listenOnData = function () {
             console.log('Proximity sensor too far from object.');
         } else {
             if (SETUP_ALARM) {
-                setupAlarm(this.cm);
+                distanceArr[0] = distanceArr[1] === null ? this.cm : distanceArr[0];
+                distanceArr[1] = this.cm;
+                distanceArr[2] = distanceArr[1];
+
+                if (Math.abs(distanceArr[1] - distanceArr[0]) > 20) { // if object got closer 20 cm
+                    saveProximityOnDatabse(getDistanceInMeters(this.cm));
+                }
             }
-            console.log('Proximity: ' + (this.cm / 100).toFixed(2) + 'm');
+            console.log('Proximity: ' + getDistanceInMeters(this.cm) + 'm');
         }
     });
 };
@@ -23,7 +45,10 @@ const listenOnData = function () {
 /**
  * @param {{distance: number}} data - float number in cm
  */
-const setupAlarm = function (data) {
+const saveProximityOnDatabse = function (data) {
+    console.log('@TODO: add scheduler');
+    return;
+
     request({
         url: 'https://us-central1-arduino-monitor-7a5c5.cloudfunctions.net/saveProximityAlarm',
         method: 'POST',
