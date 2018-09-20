@@ -6,7 +6,7 @@ const board = new five.Board();
 // const thermometer = require('./src/modules/thermometer/thermometer');
 const proximity = require('./src/modules/proximity/proximity');
 
-board.on('ready', () => {
+board.on('ready', function () {
     // led.blink();
     // button.addListeners();
     // thermometer.listenOnTemperatureChange();

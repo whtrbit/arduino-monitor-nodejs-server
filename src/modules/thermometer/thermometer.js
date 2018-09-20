@@ -2,7 +2,7 @@ const five = require('johnny-five');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
-const dateUtilities = require('../utilities/date');
+const dateUtilities = require('../../utilities/date');
 
 const thermometer = new five.Thermometer({
     controller: 'DS18B20',
@@ -24,6 +24,10 @@ const listenOnTemperatureChange = function () {
     });
 };
 
+/**
+ * @param {number} celsius
+ * @return {void}
+ */
 const saveTemperatureOnDatabse = function (celsius) {
     if (isChecked) {
         console.log('Already saved today.');
