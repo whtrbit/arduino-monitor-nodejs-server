@@ -4,22 +4,21 @@ const path = require('path');
 const request = require('request');
 const dateUtilities = require('../../utilities/date');
 
-const thermometer = new five.Thermometer({
-    controller: 'DS18B20',
-    pin: 2
-});
 const logsPath = path.resolve(__dirname + '/logs.json');
 const logs = JSON.parse(fs.readFileSync(logsPath, 'utf8')).logs;
 let isChecked = logs.length > 0 && !dateUtilities.isOlderLeastADay(logs[0].date);
 
 const listenOnTemperatureChange = function () {
+    const thermometer = new five.Thermometer({
+        controller: 'DS18B20',
+        pin: 2
+    });
+
     thermometer.on('change', function () {
         setInterval(function () {
             console.log('Temperature = ' + this.celsius + '°C');
 
-            if (!isChecked) {
-                saveTemperatureOnDatabse(Number.round(this.celsius));
-            }
+            saveTemperatureOnDatabse(Number.round(this.celsius));
         }, 3600000); // ev 1h
     });
 };
@@ -30,7 +29,7 @@ const listenOnTemperatureChange = function () {
  */
 const saveTemperatureOnDatabse = function (celsius) {
     if (isChecked) {
-        console.log('Already saved today.');
+        console.log('Temperature already saved today.');
         return undefined;
     }
 
@@ -42,7 +41,7 @@ const saveTemperatureOnDatabse = function (celsius) {
         },
         body: JSON.stringify({
             celsius: celsius,
-            date: new Date()
+            date: dateUtilities.convertToTimestamp(new Date())
         })
     }, function (err, res) {
         if (err) {
@@ -58,6 +57,8 @@ const saveTemperatureOnDatabse = function (celsius) {
             });
         }
     });
+
+    console.log('\n\n');
 };
 
 module.exports.listenOnTemperatureChange = listenOnTemperatureChange;
